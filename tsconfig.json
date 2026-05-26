@@ -1,0 +1,32 @@
+{
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"inlineSourceMap": true,
+		"inlineSources": true,
+		"module": "ESNext",
+		"target": "es2023",
+		"allowJs": true,
+		"noImplicitAny": true,
+		"noImplicitThis": true,
+		"noImplicitReturns": true,
+		"moduleResolution": "Bundler",
+		"importHelpers": true,
+		"noUncheckedIndexedAccess": true,
+		"isolatedModules": true,
+		"strictNullChecks": true,
+		"strictBindCallApply": true,
+		"allowSyntheticDefaultImports": true,
+		"useUnknownInCatchVariables": true,
+		"types": ["node"],
+		"lib": [
+			"DOM",
+			"ES5",
+			"ES6",
+			"ES7",
+			"ES2023"
+		]
+	},
+	"include": [
+		"src/**/*.ts"
+,         "src/views/add-comments-view.tsx", "src/views/view-comments-view.tsx"	]
+}
