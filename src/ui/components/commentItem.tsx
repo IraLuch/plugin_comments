@@ -1,7 +1,6 @@
 import CommentsPlugin from "../../main";
 import { Comment } from "../../types";
 import * as obsidian from "obsidian";
-import { CommentForm } from "./commentForm";
 import { formatCommentDate } from "../../utils";
 
 type Props = {
