@@ -1,8 +1,12 @@
 import { RangeSetBuilder } from '@codemirror/state';
 import { Decoration, DecorationSet, EditorView, PluginSpec, PluginValue, ViewPlugin, ViewUpdate, WidgetType } from '@codemirror/view';
-import AddCommentPlugin from './main';
+import AddCommentPlugin from '../main';
 import { Menu } from 'obsidian';
-import { throws } from 'assert';
+import CommentsPlugin from '../main';
+
+/**
+ * Класс плагина CodeMirror, для декораций текстовых тегов
+ */
 
 class CommentTagPlugin implements PluginValue {
   decorations: DecorationSet;
@@ -19,21 +23,24 @@ class CommentTagPlugin implements PluginValue {
 
   destroy() { }
 
+  /**
+     * Парсинг текста документа и создание тегов на месте сырых тегов
+     */
   buildDecorations(view: EditorView): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>();
+
     const text = view.state.doc.toString();
-    const regex = /\[#comment:(.*?)\]/g;
+    
+    const regex = /\[#comment:([0-9]+)\]/g;
     let match;
 
     while ((match = regex.exec(text)) !== null) {
-      if (!match[0]) continue;
+      if (!match[0] || !match[1]) continue;
 
-      const tagId = match[0].split(':')[1]?.replace(']', '').trim() || null
+      const tagId = match[1]
 
       const from = match.index;
       const to = match.index + match[0].length;
-
-      if (to > view.state.doc.length) continue;
 
       builder.add(
         from,
@@ -58,6 +65,10 @@ export const commentTagPlugin = ViewPlugin.fromClass(
   pluginSpec
 );
 
+
+/**
+ * Виджет, который рендерится в редакторе вместо сырого текста тега
+ */
 export class CommentTagWidget extends WidgetType {
 
   constructor(private tagId: string | null) {
@@ -65,14 +76,13 @@ export class CommentTagWidget extends WidgetType {
   }
 
   toDOM(view: EditorView): HTMLElement {
-    const span = document.createElement('a');
-    span.textContent = "#comment";
-    span.className = "tag cm-hashtag cm-hashtag-begin cm-hashtag-end";
-    span.style.cursor = "pointer";
+    const tagEl = document.createElement('a');
+    tagEl.textContent = "#comment";
+    tagEl.className = "tag";
 
-    if (this.tagId) span.id = this.tagId
+    if (this.tagId) tagEl.id = this.tagId
 
-    span.addEventListener('contextmenu', (e) => {
+    tagEl.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -84,13 +94,7 @@ export class CommentTagWidget extends WidgetType {
           .onClick(async () => {
             const plugin = this.getPlugin(view)
             if (plugin && this.tagId) {
-
               await plugin.deleteCommentByTagId(this.tagId);
-              const tagElem = document.getElementById(this.tagId)
-
-              if (tagElem) {
-                tagElem.remove();
-              }
             }
 
           });
@@ -99,7 +103,7 @@ export class CommentTagWidget extends WidgetType {
       menu.showAtPosition({ x: e.clientX, y: e.clientY });
     })
 
-    span.onclick = () => {
+    tagEl.onclick = () => {
 
       const plugin = this.getPlugin(view)
       if (plugin) {
@@ -107,18 +111,15 @@ export class CommentTagWidget extends WidgetType {
         plugin.activateView(null, this.tagId);
       }
     };
-    return span;
+    return tagEl;
   }
 
+
+  /**
+     * Извлечение экземпляра плагина 
+     */
   private getPlugin(view: EditorView) {
+    return  (window as any).app.plugins.plugins['comments'] as CommentsPlugin;
 
-    const app = (view as any).cm?.view?.plugin?.app || (window as any).app;
-    const plugin = app?.plugins?.plugins['comments'] as AddCommentPlugin;
-    return plugin
-
-  }
-
-  ignoreEvent(event: Event) {
-    return false;
   }
 }

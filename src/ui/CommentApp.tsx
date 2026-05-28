@@ -15,18 +15,23 @@ type Props ={
 
 export const CommentApp = ({allComments, plugin, filePath}: Props) => {
 
+  const [allCommentsState, setAllCommentsState] = useState<Comment[]>(allComments);
 
-
-    
-    const [comments, setComments] = useState<Comment[]>(allComments.sort((a, b) => Number(b.id) - Number(a.id)));
+const [comments, setComments] = useState<Comment[]>(allCommentsState);
     const[replyCom, setReplyCom] = useState<Comment| null>(null)
  
+    useEffect(() => {
+        const sorted = [...allComments].sort((a, b) => Number(b.id) - Number(a.id));
+        setAllCommentsState(sorted);
+        setComments(sorted); 
+    }, [allComments]);
+
     return <div className="comments">
    <div>
             <h1 className="comment__header">Окно просмотра комментариев</h1>
-           <Search setComments={setComments} comments={comments}></Search>
+           <Search  allComments={allCommentsState} setComments={setComments}></Search>
            <div className="commets__form-reply"> {replyCom && <CommentForm comment={replyCom} plugin={plugin}></CommentForm>}</div>
-           <CommentsList filePath={filePath} comments={comments} setReplyCom={setReplyCom}
+           <CommentsList filePath={filePath} comments={comments} setReplyCom={setReplyCom} setAllCommentsState={setAllCommentsState}
             plugin={plugin} setComments={setComments}></CommentsList>
    </div >
     </div>

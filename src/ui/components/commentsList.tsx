@@ -8,17 +8,18 @@ type Props = {
     setComments: (comments: Comment[]) => void
     setReplyCom: (comment: Comment) => void
     filePath: string
+    setAllCommentsState: (comments: Comment[]) => void
 }
 
 
 
-export const CommentsList = ({comments, plugin, filePath, setComments, setReplyCom}: Props) => {
+export const CommentsList = ({comments, plugin, filePath, setComments, setReplyCom, setAllCommentsState}: Props) => {
 
 
     return <div className="comments__list">
-        
-        {comments.filter(c => !c.replyTo).map(c => <CommentItem setReplyCom={setReplyCom} plugin ={plugin} setComments={setComments}
-                                        comment={c} comments={comments} filePath={filePath}
+        {comments.length === 0 && <p style={{textAlign:'center'}}>В данном файле пока нет комментариев</p>}
+        {comments.filter(c => !c.replyTo).map(c => <CommentItem key={c.id} setReplyCom={setReplyCom} plugin={plugin} setComments={setComments}
+                                        comment={c} comments={comments} filePath={filePath} setAllCommentsState={setAllCommentsState}
                                         ></CommentItem>)}
         
     </div>

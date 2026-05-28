@@ -41,6 +41,15 @@ button{
 .comments__form{
     margin-bottom: 30px;
 }
+
+.comment__item-blockquote-reply{
+    word-break: break-all;
+    cursor: pointer;
+
+}
+.comment__item-blockquote-reply:hover{
+ box-shadow:0px 0px 3px var(--blockquote-border-color) inset;
+}
 .comments__form-reply{
     margin-top: auto;
 }
@@ -117,5 +126,5 @@ button{
         border-radius: var(--radius-m);
     }
 .search__item:hover{
- box-shadow:0px 0px 12px  rgba(241, 241, 241, 0.2) inset;
+ box-shadow:0px 0px 3px var(--blockquote-border-color) inset;
 }

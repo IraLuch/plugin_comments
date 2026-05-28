@@ -6,8 +6,8 @@ import { getCommentAuthor } from "../../utils";
 type Props  ={
     comment?: Comment
     plugin: CommentsPlugin
-   selectedText?: string | null
-   filePath?: string | null
+   selectedText?: string 
+   filePath?: string 
 
 }
 
@@ -18,8 +18,6 @@ export  const CommentForm = ({comment, plugin, selectedText, filePath}: Props) =
         e.preventDefault();
 
         if(text.trim().length === 0 ) return;
-
-      
 
          const newCom: Comment = {
         id: `${Date.now()}`,
@@ -32,28 +30,14 @@ export  const CommentForm = ({comment, plugin, selectedText, filePath}: Props) =
         author: getCommentAuthor(),
         replyTo: comment? comment.id : null
       };
-
-      console.log(newCom)
-      const branch = plugin.commentsByText.get(newCom.tagId) || [];
-      branch.push(newCom);
-        plugin.commentsByText.set(newCom.tagId, branch);
     
-        await plugin.saveComments();
-
-        if (branch.length === 1) {
-           
-            plugin.insertTag(newCom.tagId);}
-
-
-  
-        plugin.activateViewByFilePath(newCom.filePath);
-
-
+        plugin.createComment(newCom)
     }
 
     return <div className="comments__form" >
+        {!comment && <h1>Добавление комментария</h1>}
         <blockquote className="comment__blockquote">{(comment && "<" + comment.comment) || selectedText}</blockquote>
-        <textarea value={text} onChange={(e) => setText(e.target.value)}></textarea>
+        <textarea placeholder="Введите комментарий..." value={text} onChange={(e) => setText(e.target.value)}></textarea>
         <button onClick={handleAdd}>Отправить</button>
     </div>
 }
