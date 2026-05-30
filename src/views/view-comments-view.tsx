@@ -34,6 +34,4 @@ export class ViewCommentsView extends ItemView {
   async onClose() {
     this.root?.unmount();
    }
-
-  
   }

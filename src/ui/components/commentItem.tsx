@@ -8,9 +8,9 @@ type Props = {
 	comment: Comment;
 	comments: Comment[];
 	setComments: (comments: Comment[]) => void;
-	setReplyCom: (Comment: Comment) => void
-	filePath: string
-	setAllCommentsState:(comments: Comment[]) => void;
+	setReplyCom: (Comment: Comment) => void;
+	filePath: string;
+	setAllCommentsState: (comments: Comment[]) => void;
 };
 
 export const CommentItem = ({
@@ -20,28 +20,36 @@ export const CommentItem = ({
 	setReplyCom,
 	setComments,
 	filePath,
-	setAllCommentsState
+	setAllCommentsState,
 }: Props) => {
 	const replyCom = comments?.find((c) => c.id == comment.replyTo);
-	
-	
+
+	/**
+	 * Контекстное меню комментария:
+	 * - ответить
+	 * - перейти к тексту
+	 * - удалить
+	 */
 	const displayMenu = (e: React.MouseEvent) => {
 		e.preventDefault();
 		const menu = new obsidian.Menu();
-		
+
 		menu.addItem((item) =>
 			item
-		.setTitle("Ответить на комментарий")
-		.setIcon("reply")
+				.setTitle("Ответить на комментарий")
+				.setIcon("reply")
 				.onClick(() => {
-					
-					
-					setReplyCom(comment)
+					document
+						.querySelector(".commets__form-reply")
+						?.scrollIntoView({
+							behavior: "smooth",
+							block: "start",
+						});
 
+					setReplyCom(comment);
 				}),
 		);
 
-	
 		menu.addItem((item) =>
 			item
 				.setTitle("Перейти к тексту в файле")
@@ -61,28 +69,35 @@ export const CommentItem = ({
 		menu.showAtMouseEvent(e.nativeEvent);
 	};
 
+	/**
+	 * Выделяет в файле текст комментария
+	 */
 	const handleJumpToFile = (comment: Comment) => {
-		plugin.openCommentInFile(comment)
-	}
-
-
-	const searchReply = (comment: Comment) => {
-		plugin.searchReply(comment, replyCom)
+		plugin.openCommentInFile(comment);
 	};
 
-	const handleDeleteComment = async (comment: Comment) => {
+	/**
+	 * Подсветка родительского комментария в списке
+	 */
+	const searchReply = (comment: Comment) => {
+		plugin.searchReply(comment, replyCom);
+	};
 
-		await plugin.deleteComment(comment)
-		const updated  = comments.filter(c => c.id !== comment.id);
+	/**
+	 * Удаляет комментарий
+	 */
+	const handleDeleteComment = async (comment: Comment) => {
+		await plugin.deleteComment(comment);
+		const updated = comments.filter((c) => c.id !== comment.id);
 		if (updated.length === 0 && plugin.app.workspace.rightSplit) {
 			plugin.app.workspace.rightSplit.collapse();
 		}
-		setComments(updated );
+		setComments(updated);
 		setAllCommentsState(updated);
-		
 	};
 
-	const replyes = comments.filter(c => c.replyTo === comment.id )
+	// ищем ответы на текущий комментарий
+	const replyes = comments.filter((c) => c.replyTo === comment.id);
 
 	return (
 		<div className="comment__thread">
@@ -91,34 +106,41 @@ export const CommentItem = ({
 					<div className="comment__info">
 						<small>Автор: {comment.author}</small>
 						<small>Дата: {formatCommentDate(comment.id)}</small>
-						<blockquote className={comment.replyTo? "comment__item-blockquote-reply comment__blockquote": "comment__blockquote"} onClick={() => searchReply(comment)}>
+						<blockquote
+							className={
+								comment.replyTo
+									? "comment__item-blockquote-reply comment__blockquote"
+									: "comment__blockquote"
+							}
+							onClick={() => searchReply(comment)}
+						>
 							{replyCom
 								? "< " + replyCom.comment
-								: comment.selectedText
-								}
+								: comment.selectedText}
 						</blockquote>
 					</div>
-					<div className="comment__item-menu" onClick={displayMenu}>⋮</div>
+					<div className="comment__item-menu" onClick={displayMenu}>
+						⋮
+					</div>
 				</div>
 				<div className="comment__item-body">{comment.comment}</div>
 			</div>
 			{replyes.length > 0 && (
-            <div className="comment__replies-box"> 
-                {replyes.map((reply) => (
-                    <CommentItem
-					setAllCommentsState= {setAllCommentsState}
-						key={reply.id}
-						filePath={filePath}
-						setComments={setComments}
-						setReplyCom={setReplyCom}
-                        comment={reply}
-                        comments={comments}
-                        plugin={plugin}
-                    />
-                ))}
-            </div>
-        )}
-		
+				<div className="comment__replies-box">
+					{replyes.map((reply) => (
+						<CommentItem
+							setAllCommentsState={setAllCommentsState}
+							key={reply.id}
+							filePath={filePath}
+							setComments={setComments}
+							setReplyCom={setReplyCom}
+							comment={reply}
+							comments={comments}
+							plugin={plugin}
+						/>
+					))}
+				</div>
+			)}
 		</div>
 	);
 };

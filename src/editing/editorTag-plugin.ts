@@ -5,7 +5,7 @@ import { Menu } from 'obsidian';
 import CommentsPlugin from '../main';
 
 /**
- * Класс плагина CodeMirror, для декораций текстовых тегов
+ * Заменяет текстовые теги [#comment:id] на UI-виджеты в редакторе
  */
 
 class CommentTagPlugin implements PluginValue {
@@ -77,7 +77,7 @@ export class CommentTagWidget extends WidgetType {
 
   toDOM(view: EditorView): HTMLElement {
     const tagEl = document.createElement('a');
-    tagEl.textContent = "#comment";
+    tagEl.textContent = "#комментарий";
     tagEl.className = "tag";
 
     if (this.tagId) tagEl.id = this.tagId

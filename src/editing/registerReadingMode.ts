@@ -13,13 +13,14 @@ export function registerReadingMode(plugin: CommentsPlugin) {
 
         paragraphs.forEach(p => {
 
+            // обрабатываем только элементы, содержащие тег комментария
             if (p.textContent && p.textContent.includes("#comment:")) {
 
                 const tagRegex = /\[<a[^>]*>#comment<\/a>:([0-9]+)\]/g;
                 let html = p.innerHTML
 
                 //замена сырого текста на тег
-                p.innerHTML = html.replace(tagRegex, '<a class="tag comment-tag"  id="$1">#comment</a>');
+                p.innerHTML = html.replace(tagRegex, '<a class="tag comment-tag"  id="$1">#комментарий</a>');
 
                 const elemTags = p.querySelectorAll('.comment-tag')
 

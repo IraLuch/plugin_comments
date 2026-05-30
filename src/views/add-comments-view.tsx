@@ -18,6 +18,7 @@ export class AddCommentView extends ItemView {
     const container = this.contentEl;
     container.empty();
     this.root = createRoot(container);
+    
     this.root.render(
 			<CommentForm filePath={filePath} plugin={this.plugin} selectedText={text}></CommentForm>
 		);

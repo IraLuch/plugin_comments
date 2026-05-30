@@ -43,12 +43,18 @@ export default class CommentsPlugin extends Plugin {
 
   };
 
+  /**
+    * Загружает сохранённые комментарии из data.json
+    */
   async loadComments() {
     const data = await super.loadData();
     if (!data || !data.commentsByText) return;
     this.commentsByText = new Map(Object.entries(data.commentsByText));
   }
 
+  /**
+     *  Сохраняет текущее состояние комментариев в data.json
+     */
   async saveComments() {
     const obj = {
       commentsByText: Object.fromEntries(this.commentsByText)
@@ -56,12 +62,16 @@ export default class CommentsPlugin extends Plugin {
     await this.saveData(obj);
   }
 
+
+  /**
+   *  Удаляет всю ветку комментариев по идентификатору тега
+   */
   async deleteCommentByTagId(tagId: string | null) {
 
     if (!tagId) return;
 
     this.commentsByText.delete(tagId)
-    
+
 
     if (this.app.workspace.rightSplit) {
       this.app.workspace.rightSplit.collapse();
@@ -76,9 +86,15 @@ export default class CommentsPlugin extends Plugin {
     new Notice("Комментарий успешно удален");
   }
 
+
+  /**
+    *  Открывает правую панель
+    * если передан text — форма создания комментария,
+    * иначе просмотр существующих комментариев
+    */
   async activateView(text: string | null = null, id: string | null = null) {
 
-    //если передан текст - открываем окно для добавлния, иначе - просмотр
+
     const viewType = text ? VIEW_TYPE_ADD_COMMENT : VIEW_TYPE_VIEW_COMMENTS;
 
     const { workspace } = this.app;
@@ -112,6 +128,11 @@ export default class CommentsPlugin extends Plugin {
     workspace.revealLeaf(leaf);
   }
 
+
+  /**
+    *   Получает существующую панель нужного типа
+    * или создаёт новую справа
+    */
   private async getLeaf(viewType: string) {
     const { workspace } = this.app;
     let leaf: WorkspaceLeaf | null = null;
@@ -126,6 +147,10 @@ export default class CommentsPlugin extends Plugin {
     return leaf;
   }
 
+  /**
+   *   Добавляет комментарий в ветку и создаёт тег в тексте
+   * если это первый комментарий для данного блока
+   */
   async createComment(comment: Comment) {
     const branch = this.commentsByText.get(comment.tagId) || [];
     branch.push(comment);
@@ -139,6 +164,10 @@ export default class CommentsPlugin extends Plugin {
     await this.saveComments();
     this.activateView(null, comment.tagId);
   }
+
+  /**
+   *  Обрабатывает создание комментария для текущего выделения
+   */
   async addComment(editor: Editor) {
 
     const sel = editor.getSelection();
@@ -161,6 +190,8 @@ export default class CommentsPlugin extends Plugin {
     };
     const textAfterSelection = editor.getRange(this.to, endPos);
 
+    // проверяем, есть ли уже тег комментария после выделенного текста.
+    // если есть — используем существующую ветку комментариев.
     const tagMatch = textAfterSelection.match(/^\s*\[#comment:([0-9]+)\]/);
 
     if (tagMatch && tagMatch[1]) {
@@ -171,6 +202,10 @@ export default class CommentsPlugin extends Plugin {
     await this.activateView(sel, this.id);
   }
 
+
+  /**
+    *  Вставляет маркер комментария в текст документа
+    */
   async insertTag(tagId: string) {
 
     if (!this.to) return;
@@ -192,6 +227,11 @@ export default class CommentsPlugin extends Plugin {
     this.from = null;
     this.id = null;
   }
+
+  /**
+    *   Удаляет тег комментария из файла,
+    * если ветка комментариев была полностью удалена
+    */
   async removeTag(com: Comment) {
     const file = this.app.vault.getAbstractFileByPath(com.filePath);
     if (!file || !(file instanceof TFile)) return;
@@ -208,19 +248,25 @@ export default class CommentsPlugin extends Plugin {
     }
   }
 
+
+  /**
+    *   Переходит к месту в файле, связанному с комментарием,
+    *  прокручивает редактор и подсвечивает текст
+    */
   openCommentInFile(comment: Comment) {
     let markdownView: MarkdownView | null = null;
 
     this.app.workspace.iterateAllLeaves((leaf) => {
       if (leaf.view instanceof MarkdownView && leaf.view.file?.path === comment.filePath) {
         markdownView = leaf.view;
-      }});
+      }
+    });
 
     if (!markdownView) {
       new Notice(`Файл ${comment.filePath} должен быть открыт на экране.`);
       return;
     }
-    if (!markdownView) return;
+
 
     this.app.workspace.setActiveLeaf((markdownView as MarkdownView).leaf, { focus: true });
 
@@ -279,36 +325,45 @@ export default class CommentsPlugin extends Plugin {
 
   }
 
-  searchReply(comment: Comment, replyCom: Comment | undefined){
-  if (!replyCom && comment.replyTo) 
-			{
-			new Notice("Комментарий не найден");
-			return;
-		}
-		if(!replyCom) return;
-		const container = document.querySelector('.comments');
-		const comEl = container?.querySelector(`[id="${replyCom.id}"]`);
-	
-		if (!comEl) return;
-		comEl?.scrollIntoView({ behavior: "smooth", block: "center" });
-		comEl?.classList.add("is-highlighted");
-		setTimeout(() => {
-			comEl?.classList.remove("is-highlighted");
-		}, 4500);
+
+  /**
+  *   Находит родительский комментарий в списке ответов
+  *  и временно подсвечивает его
+  */
+  searchReply(comment: Comment, replyCom: Comment | undefined) {
+    if (!replyCom && comment.replyTo) {
+      new Notice("Комментарий не найден");
+      return;
+    }
+    if (!replyCom) return;
+    const container = document.querySelector('.comments');
+    const comEl = container?.querySelector(`[id="${replyCom.id}"]`);
+
+    if (!comEl) return;
+    comEl?.scrollIntoView({ behavior: "smooth", block: "center" });
+    comEl?.classList.add("is-highlighted");
+    setTimeout(() => {
+      comEl?.classList.remove("is-highlighted");
+    }, 4500);
   }
 
-   async deleteComment(comment: Comment){
-    const branch = this.commentsByText.get(comment.tagId) || [];
-		const updateBranch = branch?.filter((c) => c.id !== comment.id);
-		this.commentsByText.set(comment.tagId, updateBranch);
 
-		await this.saveComments();
-	
-		if (updateBranch.length === 0 || !comment.replyTo) {
-			this.commentsByText.delete(comment.tagId);
-			this.removeTag(comment);
-		}
-	
+  /**
+  *  Удаляет комментарий
+  *   если ветка становится пустой — удаляет тег из файла
+  */
+  async deleteComment(comment: Comment) {
+    const branch = this.commentsByText.get(comment.tagId) || [];
+    const updateBranch = branch?.filter((c) => c.id !== comment.id);
+    this.commentsByText.set(comment.tagId, updateBranch);
+
+    await this.saveComments();
+
+    if (updateBranch.length === 0 || !comment.replyTo) {
+      this.commentsByText.delete(comment.tagId);
+      this.removeTag(comment);
+    }
+
   }
   async onunload() { }
 }

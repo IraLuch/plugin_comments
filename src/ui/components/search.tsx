@@ -6,42 +6,45 @@ type Props = {
 	allComments: Comment[];
 };
 
-export const Search = ({
-	setComments,
-	allComments,
-}: Props) => {
-
+/**
+ * Поиск комментариев по выделенному тексту блока,
+ * выбор уникальных блоков комментариев
+ */
+export const Search = ({ setComments, allComments }: Props) => {
 	const [value, setValue] = useState("");
 	const [isVisible, setIsVisible] = useState(false);
 
+	// убираем дубликаты комментариев по tagId
 	const uniqueBlocks = Array.from(
-		new Map(allComments.map((c) => [c.tagId, c])).values()
+		new Map(allComments.map((c) => [c.tagId, c])).values(),
 	);
 
+	/**
+	 * Фильтрует комментарии по введённому тексту
+	 */
 	const handleChange = (value: string) => {
 		setValue(value);
 
 		if (value.trim().length === 0) {
 			setComments(allComments);
+		} else {
+			const filtered = allComments.filter((c) =>
+				c.selectedText.toLowerCase().includes(value.toLowerCase()),
+			);
+			setComments(filtered);
 		}
-        else {
-            const filtered = allComments.filter((c) => 
-                c.selectedText.toLowerCase().includes(value.toLowerCase())
-            );
-            setComments(filtered);
-        }
 	};
 
-	const selectBlock = (
-		e: React.MouseEvent,
-		comment: Comment
-	) => {
+	/**
+	 * Выбор блока комментариев из списка поиска
+	 */
+	const selectBlock = (e: React.MouseEvent, comment: Comment) => {
 		e.preventDefault();
 		e.stopPropagation();
 
 		setValue(comment.selectedText);
 
-	setComments(allComments.filter((c) => c.tagId === comment.tagId));
+		setComments(allComments.filter((c) => c.tagId === comment.tagId));
 
 		setIsVisible(false);
 	};
@@ -64,15 +67,13 @@ export const Search = ({
 						.filter((c) =>
 							c.selectedText
 								.toLowerCase()
-								.includes(value.toLowerCase())
+								.includes(value.toLowerCase()),
 						)
 						.map((c) => (
 							<div
 								key={c.tagId}
 								className="search__item"
-								onMouseDown={(e) =>
-									selectBlock(e, c)
-								}
+								onMouseDown={(e) => selectBlock(e, c)}
 							>
 								{c.selectedText}
 							</div>

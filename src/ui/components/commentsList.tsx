@@ -12,9 +12,11 @@ type Props = {
 }
 
 
-
+/**
+ * Список комментариев файла.
+ * Рендерит только корневые комментарии (без replyTo),
+ */
 export const CommentsList = ({comments, plugin, filePath, setComments, setReplyCom, setAllCommentsState}: Props) => {
-
 
     return <div className="comments__list">
         {comments.length === 0 && <p style={{textAlign:'center'}}>В данном файле пока нет комментариев</p>}
