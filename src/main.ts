@@ -210,13 +210,10 @@ export default class CommentsPlugin extends Plugin {
 
     if (!this.to) return;
     const view = this.sourceLeaf?.view;
-    console.log(view)
 
     if (!(view instanceof MarkdownView)) return;
-
-
+    
     const editor = view.editor;
-    console.log(editor)
 
     const tagText = `[#comment:${tagId}]`;
 

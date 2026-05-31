@@ -1,5 +1,5 @@
-import { SearchComponent } from "obsidian";
-import { useEffect, useRef, useState } from "react";
+
+import { useEffect, useState } from "react";
 import { Comment } from "../types";
 import { CommentsList } from "./components/commentsList";
 import { Search } from "./components/search";
@@ -13,7 +13,7 @@ type Props = {
 };
 
 export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
-    
+
 	// используется как источник данных для фильтрации
 	const [allCommentsState, setAllCommentsState] =
 		useState<Comment[]>(allComments);
@@ -22,9 +22,7 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 	const [comments, setComments] = useState<Comment[]>(allCommentsState);
 	const [replyCom, setReplyCom] = useState<Comment | null>(null);
 
-	/**
-	 * + Сортировка по времени
-	 */
+	// сортировка по времени
 	useEffect(() => {
 		const sorted = [...allComments].sort(
 			(a, b) => Number(b.id) - Number(a.id),
