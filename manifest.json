@@ -3,10 +3,10 @@
 	"name": "comments",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
+	"description":"Adds inline comments and threaded discussions for selected text in Obsidian.",
 	"author": "IraLuch",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"authorUrl": "https://github.com/IraLuch",
+	"fundingUrl": "",
 	"isDesktopOnly": false,
 	"css": "styles.css"
 }

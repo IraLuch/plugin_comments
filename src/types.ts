@@ -1,4 +1,4 @@
-import { EditorPosition, NullValue } from 'obsidian';
+import { EditorPosition } from 'obsidian';
 
 export type Comment = {
   id: string;
@@ -9,7 +9,7 @@ export type Comment = {
   to: EditorPosition | null;
   filePath: string;
   replyTo?: string | null,
-  author: string | null
+  author?: string
 };
 
 

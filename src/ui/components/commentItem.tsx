@@ -40,8 +40,7 @@ export const CommentItem = ({
 				.setIcon("reply")
 				.onClick(() => {
 					document
-						.querySelector(".commets__form-reply")
-						?.scrollIntoView({
+						.querySelector(".comment__header")?.scrollIntoView({
 							behavior: "smooth",
 							block: "start",
 						});
