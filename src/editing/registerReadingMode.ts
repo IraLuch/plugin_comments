@@ -20,7 +20,7 @@ export function registerReadingMode(plugin: CommentsPlugin) {
                 let html = p.innerHTML
 
                 //замена сырого текста на тег
-                p.innerHTML = html.replace(tagRegex, '<a class="tag comment-tag"  id="$1">#комментарий</a>');
+                p.innerHTML = html.replace(tagRegex, '<a class="comment-tag" id="$1">^^$1</a>');
 
                 const elemTags = p.querySelectorAll('.comment-tag')
 

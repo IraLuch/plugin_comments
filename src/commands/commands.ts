@@ -50,10 +50,8 @@ export function registerCommands(plugin: CommentsPlugin) {
             if (tagMatch && tagMatch[1]) {
                 await plugin.deleteCommentByTagId(tagMatch[1])
                 editor.replaceSelection("");
-
             }
             else {
-
                 new Notice("Выделите тег комментария целиком, чтобы удалить его");
             }
 

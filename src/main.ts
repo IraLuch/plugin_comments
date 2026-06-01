@@ -1,10 +1,10 @@
 import { Editor, EditorPosition, TFile, Notice, Plugin, WorkspaceLeaf, MarkdownView, EditorRange } from 'obsidian';
 import { commentTagPlugin } from './editing/editorTag-plugin';
-import { AddCommentView, VIEW_TYPE_ADD_COMMENT } from './views/add-comments-view';
 import { Comment } from './types';
-import { VIEW_TYPE_VIEW_COMMENTS, ViewCommentsView } from './views/view-comments-view';
+
 import { registerReadingMode } from './editing/registerReadingMode';
 import { registerCommands } from './commands/commands';
+import { ViewCommentsView,  VIEW_TYPE_COMMENTS} from './views/view-comments';
 
 
 export default class CommentsPlugin extends Plugin {
@@ -29,13 +29,10 @@ export default class CommentsPlugin extends Plugin {
 
     registerCommands(this);
 
-    this.registerView(
-      VIEW_TYPE_ADD_COMMENT,
-      (leaf) => new AddCommentView(leaf, this)
-    );
+
 
     this.registerView(
-      VIEW_TYPE_VIEW_COMMENTS,
+      VIEW_TYPE_COMMENTS,
       (leaf) => new ViewCommentsView(leaf, this)
     );
 
@@ -94,11 +91,8 @@ export default class CommentsPlugin extends Plugin {
     */
   async activateView(text: string | null = null, id: string | null = null) {
 
-
-    const viewType = text ? VIEW_TYPE_ADD_COMMENT : VIEW_TYPE_VIEW_COMMENTS;
-
     const { workspace } = this.app;
-    const leaf = await this.getLeaf(viewType);
+    const leaf = await this.getLeaf(VIEW_TYPE_COMMENTS);
 
     if (!leaf) return;
     const view = leaf.view;
@@ -106,15 +100,13 @@ export default class CommentsPlugin extends Plugin {
     const activeFile = this.app.workspace.getActiveFile();
     if (!activeFile) return;
 
-    if (view instanceof AddCommentView) {
-      if (!text || !id || !this.filePath) return;
-      view.render(text, this.filePath);
-    }
 
-    else if (view instanceof ViewCommentsView) {
+    if (view instanceof ViewCommentsView) {
+      if (text && id && this.filePath) 
+        { view.renderForm(text, this.filePath); }
 
       // открываем все комментарии файла
-      if (!id) {
+      else if (!id) {
         const allComments = Array.from(this.commentsByText.values()).flat().filter(c => c.filePath === activeFile?.path);
         view.renderComments(allComments, activeFile.path);
       }
@@ -212,7 +204,7 @@ export default class CommentsPlugin extends Plugin {
     const view = this.sourceLeaf?.view;
 
     if (!(view instanceof MarkdownView)) return;
-    
+
     const editor = view.editor;
 
     const tagText = `[#comment:${tagId}]`;

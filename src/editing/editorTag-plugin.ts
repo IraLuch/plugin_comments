@@ -67,7 +67,7 @@ export const commentTagPlugin = ViewPlugin.fromClass(
 
 
 /**
- * Виджет, который рендерится в редакторе вместо сырого текста тега
+ * Виджет, который рендерится в редакторе вместо сырого текста 
  */
 export class CommentTagWidget extends WidgetType {
 
@@ -77,8 +77,8 @@ export class CommentTagWidget extends WidgetType {
 
   toDOM(view: EditorView): HTMLElement {
     const tagEl = document.createElement('a');
-    tagEl.textContent = "#комментарий";
-    tagEl.className = "tag";
+    tagEl.textContent = `^^${this.tagId}`;
+
 
     if (this.tagId) tagEl.id = this.tagId
 
