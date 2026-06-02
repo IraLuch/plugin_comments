@@ -11,7 +11,6 @@ type Props = {
 	setReplyCom: (Comment: Comment) => void;
 	filePath: string;
 	setAllCommentsState: (comments: Comment[]) => void;
-	setSelectedTagId: (tagId: string) => void;
 };
 
 export const CommentItem = ({
@@ -21,8 +20,7 @@ export const CommentItem = ({
 	setReplyCom,
 	setComments,
 	filePath,
-	setAllCommentsState,
-	setSelectedTagId,
+	setAllCommentsState
 }: Props) => {
 	const replyCom = comments?.find((c) => c.id == comment.replyTo);
 
@@ -34,7 +32,8 @@ export const CommentItem = ({
 	 */
 	const displayMenu = (e: React.MouseEvent) => {
 		e.preventDefault();
-		const menu = new obsidian.Menu();
+		e.stopPropagation();
+				const menu = new obsidian.Menu();
 
 		menu.addItem((item) =>
 			item
@@ -79,7 +78,9 @@ export const CommentItem = ({
 	/**
 	 * Подсветка родительского комментария в списке
 	 */
-	const searchReply = (comment: Comment) => {
+	const searchReply = (e:React.MouseEvent, comment: Comment) => {
+		e.preventDefault();
+		e.stopPropagation();
 		plugin.searchReply(comment, replyCom);
 	};
 
@@ -100,8 +101,15 @@ export const CommentItem = ({
 	// ищем ответы на текущий комментарий
 	const replyes = comments.filter((c) => c.replyTo === comment.id);
 
+	const handleToBlock = (comment: Comment) => {
+	    const comments=	plugin.get
+		CommentBlock(comment)
+		setComments(comments)
+		setAllCommentsState(comments)
+	}
+
 	return (
-		<div className="comment__thread">
+		<div className="comment__thread" onClick={() => handleToBlock(comment)}>
 			<div className="comment__item" id={comment.id}>
 				<div className="comment__item-header">
 					<div className="comment__info">
@@ -113,7 +121,7 @@ export const CommentItem = ({
 									? "comment__item-blockquote-reply comment__blockquote"
 									: "comment__blockquote"
 							}
-							onClick={() => searchReply(comment)}
+							onClick={(e) => searchReply(e, comment)}
 						>
 							{replyCom
 								? "< " + replyCom.comment
@@ -130,7 +138,6 @@ export const CommentItem = ({
 				<div className="comment__replies-box">
 					{replyes.map((reply) => (
 						<CommentItem
-							setSelectedTagId={setSelectedTagId}
 							setAllCommentsState={setAllCommentsState}
 							key={reply.id}
 							filePath={filePath}

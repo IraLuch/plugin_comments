@@ -23,7 +23,6 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 	const [comments, setComments] = useState<Comment[]>(allCommentsState);
 	const [replyCom, setReplyCom] = useState<Comment | null>(null);
 
-	const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
 	// сортировка по времени
 	useEffect(() => {
 		const sorted = [...allComments].sort(
@@ -62,7 +61,6 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 					setAllCommentsState={setAllCommentsState}
 					plugin={plugin}
 					setComments={setComments}
-					setSelectedTagId = {setSelectedTagId}
 				></CommentsList>
 			</div>
 		</div>

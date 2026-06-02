@@ -378,6 +378,25 @@ export default class CommentsPlugin extends Plugin {
     }
 
   }
+  getCommentBlock(comment: Comment){
+
+      const allComments = Array.from(this.commentsByText.values()).flat();
+      const result: Comment[] = [comment];
+
+      const findReplies = (id: string) => {
+      const replies = allComments.filter(c => c.replyTo === id) 
+
+        for (const r of replies){
+          result.push(r);
+          findReplies(r.id);
+        }
+
+      }
+    
+      findReplies(comment.id)
+      return result;
+  }
+
   async onunload() { }
 }
 

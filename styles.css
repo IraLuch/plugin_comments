@@ -8,6 +8,12 @@ button {
 	 margin-bottom: 10px;
 	 font-size: 13px;
 }
+.comment__item-menu{
+	display: block;
+	width: 15px;
+	height: 25px;
+
+}
 
 .highlighted-comment-line {
 	background-color: var(--text-highlight-bg);
@@ -29,7 +35,19 @@ button {
 
 .is-highlighted {
     box-shadow: 2px 2px 2px 2px var(--blockquote-border-color);
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow 0.5s  ease;
+}
+
+.comments__list > .comment__thread {
+	cursor: pointer;
+	padding: 3px;
+	border: 1px solid transparent;
+    border-radius: 10px;
+	transition: border 0.5s ease;
+}
+
+.comments__list > .comment__thread:hover{
+	border-color:var(--blockquote-border-color);
 }
 
 .comments,
