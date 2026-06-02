@@ -23,6 +23,7 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 	const [comments, setComments] = useState<Comment[]>(allCommentsState);
 	const [replyCom, setReplyCom] = useState<Comment | null>(null);
 
+	const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
 	// сортировка по времени
 	useEffect(() => {
 		const sorted = [...allComments].sort(
@@ -32,10 +33,15 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 		setComments(sorted);
 	}, [allComments]);
 
+	const handleBack = () => {
+		plugin.activateView();
+	}
+
 	return (
 		<div className="comments">
 			<div>
 				<h1 className="comment__header">Окно просмотра комментариев</h1>
+			{  new Set(comments.map(c => c.tagId)).size === 1 && <span className="comments__btn-all" onClick={handleBack}>Ко всем комментариям</span>}
 				<Search
 					allComments={allCommentsState}
 					setComments={setComments}
@@ -56,6 +62,7 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 					setAllCommentsState={setAllCommentsState}
 					plugin={plugin}
 					setComments={setComments}
+					setSelectedTagId = {setSelectedTagId}
 				></CommentsList>
 			</div>
 		</div>

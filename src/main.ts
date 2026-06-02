@@ -380,3 +380,4 @@ export default class CommentsPlugin extends Plugin {
   }
   async onunload() { }
 }
+

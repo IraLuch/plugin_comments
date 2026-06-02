@@ -1,6 +1,13 @@
 button {
 	cursor: pointer;
 }
+.comments__btn-all{
+	cursor: pointer;
+	 text-decoration: underline;
+	 display: block;
+	 margin-bottom: 10px;
+	 font-size: 13px;
+}
 
 .highlighted-comment-line {
 	background-color: var(--text-highlight-bg);

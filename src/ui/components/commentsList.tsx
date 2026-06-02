@@ -9,6 +9,7 @@ type Props = {
     setReplyCom: (comment: Comment) => void
     filePath: string
     setAllCommentsState: (comments: Comment[]) => void
+    setSelectedTagId: (tagId: string) => void
 }
 
 
@@ -16,12 +17,13 @@ type Props = {
  * Список комментариев файла.
  * Рендерит только корневые комментарии (без replyTo),
  */
-export const CommentsList = ({comments, plugin, filePath, setComments, setReplyCom, setAllCommentsState}: Props) => {
+export const CommentsList = ({comments, plugin, filePath, setComments, setReplyCom, setAllCommentsState, setSelectedTagId}: Props) => {
 
     return <div className="comments__list">
+ 
         {comments.length === 0 && <p style={{textAlign:'center'}}>В данном файле пока нет комментариев</p>}
         {comments.filter(c => !c.replyTo).map(c => <CommentItem key={c.id} setReplyCom={setReplyCom} plugin={plugin} setComments={setComments}
-                                        comment={c} comments={comments} filePath={filePath} setAllCommentsState={setAllCommentsState}
+                                        comment={c} comments={comments} filePath={filePath} setAllCommentsState={setAllCommentsState} setSelectedTagId={setSelectedTagId}
                                         ></CommentItem>)}
         
     </div>

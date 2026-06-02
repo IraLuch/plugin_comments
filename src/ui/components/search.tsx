@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Comment } from "../../types";
 
 type Props = {
@@ -50,13 +50,19 @@ export const Search = ({ setComments, allComments }: Props) => {
 		setIsVisible(false);
 	};
 
+	useEffect(() => {
+  if (new Set(allComments.map(c => c.tagId)).size > 1) {
+    setValue('');
+  }
+}, [allComments]);
+
 	return (
 		<div className="search">
 			<input
 				placeholder="Введите текст для поиска блока..."
 				className="search__input"
 				type="text"
-				value={value}
+				value= {value}
 				onClick={() => setIsVisible(true)}
 				onChange={(e) => handleChange(e.target.value)}
 				onBlur={() => setIsVisible(false)}

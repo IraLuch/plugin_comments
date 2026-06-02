@@ -11,6 +11,7 @@ type Props = {
 	setReplyCom: (Comment: Comment) => void;
 	filePath: string;
 	setAllCommentsState: (comments: Comment[]) => void;
+	setSelectedTagId: (tagId: string) => void;
 };
 
 export const CommentItem = ({
@@ -21,6 +22,7 @@ export const CommentItem = ({
 	setComments,
 	filePath,
 	setAllCommentsState,
+	setSelectedTagId,
 }: Props) => {
 	const replyCom = comments?.find((c) => c.id == comment.replyTo);
 
@@ -39,11 +41,10 @@ export const CommentItem = ({
 				.setTitle("Ответить на комментарий")
 				.setIcon("reply")
 				.onClick(() => {
-					document
-						.querySelector(".comment__header")?.scrollIntoView({
-							behavior: "smooth",
-							block: "start",
-						});
+					document.querySelector(".comment__header")?.scrollIntoView({
+						behavior: "smooth",
+						block: "start",
+					});
 
 					setReplyCom(comment);
 				}),
@@ -87,7 +88,7 @@ export const CommentItem = ({
 	 */
 	const handleDeleteComment = async (comment: Comment) => {
 		await plugin.deleteComment(comment);
-		
+
 		const updated = comments.filter((c) => c.id !== comment.id);
 		if (updated.length === 0 && plugin.app.workspace.rightSplit) {
 			plugin.app.workspace.rightSplit.collapse();
@@ -129,6 +130,7 @@ export const CommentItem = ({
 				<div className="comment__replies-box">
 					{replyes.map((reply) => (
 						<CommentItem
+							setSelectedTagId={setSelectedTagId}
 							setAllCommentsState={setAllCommentsState}
 							key={reply.id}
 							filePath={filePath}
