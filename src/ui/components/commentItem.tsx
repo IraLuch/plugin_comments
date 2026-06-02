@@ -87,6 +87,7 @@ export const CommentItem = ({
 	 */
 	const handleDeleteComment = async (comment: Comment) => {
 		await plugin.deleteComment(comment);
+		
 		const updated = comments.filter((c) => c.id !== comment.id);
 		if (updated.length === 0 && plugin.app.workspace.rightSplit) {
 			plugin.app.workspace.rightSplit.collapse();

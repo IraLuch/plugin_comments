@@ -27,6 +27,7 @@ export const Search = ({ setComments, allComments }: Props) => {
 
 		if (value.trim().length === 0) {
 			setComments(allComments);
+			
 		} else {
 			const filtered = allComments.filter((c) =>
 				c.selectedText.toLowerCase().includes(value.toLowerCase()),

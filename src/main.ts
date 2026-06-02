@@ -4,7 +4,7 @@ import { Comment } from './types';
 
 import { registerReadingMode } from './editing/registerReadingMode';
 import { registerCommands } from './commands/commands';
-import { ViewCommentsView,  VIEW_TYPE_COMMENTS} from './views/view-comments';
+import { ViewCommentsView, VIEW_TYPE_COMMENTS } from './views/view-comments';
 
 
 export default class CommentsPlugin extends Plugin {
@@ -30,6 +30,27 @@ export default class CommentsPlugin extends Plugin {
     registerCommands(this);
 
 
+    this.registerEvent(
+      this.app.workspace.on("file-open", async () => {
+        const activeFile = this.app.workspace.getActiveFile();
+        if (!activeFile) return;
+
+        const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_COMMENTS);
+
+        if (leaves.length === 0) return;
+
+        const leaf = leaves[0]!;
+
+        const comments = Array.from(this.commentsByText.values()).flat()
+          .filter(c => c.filePath === activeFile.path);
+
+        if (leaf.view instanceof ViewCommentsView) {
+          leaf.view.renderComments(comments, activeFile.path);
+        }
+      }
+
+
+      ));
 
     this.registerView(
       VIEW_TYPE_COMMENTS,
@@ -64,6 +85,7 @@ export default class CommentsPlugin extends Plugin {
    *  Удаляет всю ветку комментариев по идентификатору тега
    */
   async deleteCommentByTagId(tagId: string | null) {
+
 
     if (!tagId) return;
 
@@ -102,8 +124,7 @@ export default class CommentsPlugin extends Plugin {
 
 
     if (view instanceof ViewCommentsView) {
-      if (text && id && this.filePath) 
-        { view.renderForm(text, this.filePath); }
+      if (text && id && this.filePath) { view.renderForm(text, this.filePath); }
 
       // открываем все комментарии файла
       else if (!id) {
@@ -187,7 +208,8 @@ export default class CommentsPlugin extends Plugin {
     const tagMatch = textAfterSelection.match(/^\s*\[#comment:([0-9]+)\]/);
 
     if (tagMatch && tagMatch[1]) {
-      this.id = tagMatch[1];
+
+        this.id = tagMatch[1];
     } else {
       this.id = `${Date.now()}`;
     }
@@ -294,6 +316,7 @@ export default class CommentsPlugin extends Plugin {
     editor.setSelection(startPosition, endPosition);
     editor.focus();
 
+
     const selectionElements = (markdownView as MarkdownView).contentEl.querySelectorAll('.cm-selectionBackground');
 
     selectionElements.forEach((el) => {
@@ -343,12 +366,13 @@ export default class CommentsPlugin extends Plugin {
   */
   async deleteComment(comment: Comment) {
     const branch = this.commentsByText.get(comment.tagId) || [];
-    const updateBranch = branch?.filter((c) => c.id !== comment.id);
+    const updateBranch = branch?.filter((c) => c.id !== comment.id && c.replyTo != comment.id);
+
     this.commentsByText.set(comment.tagId, updateBranch);
 
     await this.saveComments();
 
-    if (updateBranch.length === 0 || !comment.replyTo) {
+    if (updateBranch.length === 0) {
       this.commentsByText.delete(comment.tagId);
       this.removeTag(comment);
     }

@@ -18,6 +18,7 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 	const [allCommentsState, setAllCommentsState] =
 		useState<Comment[]>(allComments);
 
+		
 	// отображаемый список комментариев
 	const [comments, setComments] = useState<Comment[]>(allCommentsState);
 	const [replyCom, setReplyCom] = useState<Comment | null>(null);

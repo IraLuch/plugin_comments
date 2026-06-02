@@ -17,6 +17,10 @@ export class ViewCommentsView extends ItemView {
   }
 
   renderComments(comments: Comment[], filePath: string) {
+ console.log(
+        "renderComments",
+        comments.map(c => c.tagId)
+    );
 
      const container = this.contentEl;
     container.empty();
