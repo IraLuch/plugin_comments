@@ -23,6 +23,8 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 	const [comments, setComments] = useState<Comment[]>(allCommentsState);
 	const [replyCom, setReplyCom] = useState<Comment | null>(null);
 
+	const [showBackButton, setShowBackButton] = useState<boolean>(false);
+
 	// сортировка по времени
 	useEffect(() => {
 		const sorted = [...allComments].sort(
@@ -34,13 +36,14 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 
 	const handleBack = () => {
 		plugin.activateView();
+		setShowBackButton(false)
 	}
 
 	return (
 		<div className="comments">
 			<div>
 				<h1 className="comment__header">Окно просмотра комментариев</h1>
-			{  new Set(comments.map(c => c.tagId)).size === 1 && <span className="comments__btn-all" onClick={handleBack}>Ко всем комментариям</span>}
+			{ showBackButton  && <span className="comments__btn-all" onClick={handleBack}>Ко всем комментариям</span>}
 				<Search
 					allComments={allCommentsState}
 					setComments={setComments}
@@ -55,6 +58,7 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 					)}
 				</div>
 				<CommentsList
+					setShowBackButton = {setShowBackButton}
 					filePath={filePath}
 					comments={comments}
 					setReplyCom={setReplyCom}

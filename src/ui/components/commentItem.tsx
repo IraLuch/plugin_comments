@@ -11,6 +11,7 @@ type Props = {
 	setReplyCom: (Comment: Comment) => void;
 	filePath: string;
 	setAllCommentsState: (comments: Comment[]) => void;
+	 setShowBackButton: (visible: boolean) => void;
 };
 
 export const CommentItem = ({
@@ -20,7 +21,8 @@ export const CommentItem = ({
 	setReplyCom,
 	setComments,
 	filePath,
-	setAllCommentsState
+	setAllCommentsState,
+	setShowBackButton
 }: Props) => {
 	const replyCom = comments?.find((c) => c.id == comment.replyTo);
 
@@ -102,14 +104,18 @@ export const CommentItem = ({
 	const replyes = comments.filter((c) => c.replyTo === comment.id);
 
 	const handleToBlock = (comment: Comment) => {
-	    const comments=	plugin.get
-		CommentBlock(comment)
+	    const comments=	plugin.getCommentBlock(comment)
 		setComments(comments)
 		setAllCommentsState(comments)
+		setShowBackButton(true)
 	}
 
+	const hasAction = new Set(comments.map(c => c.tagId)).size !== 1
+
 	return (
-		<div className="comment__thread" onClick={() => handleToBlock(comment)}>
+		<div className={hasAction? "comment__thread": ''}  onClick={hasAction
+																	? () => handleToBlock(comment)
+																	: undefined }>
 			<div className="comment__item" id={comment.id}>
 				<div className="comment__item-header">
 					<div className="comment__info">
@@ -138,6 +144,7 @@ export const CommentItem = ({
 				<div className="comment__replies-box">
 					{replyes.map((reply) => (
 						<CommentItem
+						setShowBackButton ={setShowBackButton}
 							setAllCommentsState={setAllCommentsState}
 							key={reply.id}
 							filePath={filePath}
