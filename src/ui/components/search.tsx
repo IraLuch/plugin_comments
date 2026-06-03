@@ -4,13 +4,14 @@ import { Comment } from "../../types";
 type Props = {
 	setComments: (comments: Comment[]) => void;
 	allComments: Comment[];
+	showBackButton:  boolean 
 };
 
 /**
  * Поиск комментариев по выделенному тексту блока,
  * выбор уникальных блоков комментариев
  */
-export const Search = ({ setComments, allComments }: Props) => {
+export const Search = ({ setComments, allComments, showBackButton }: Props) => {
 	const [value, setValue] = useState("");
 	const [isVisible, setIsVisible] = useState(false);
 
@@ -51,10 +52,10 @@ export const Search = ({ setComments, allComments }: Props) => {
 	};
 
 	useEffect(() => {
-  if (new Set(allComments.map(c => c.tagId)).size > 1) {
+  if (new Set(allComments.map(c => c.tagId)).size !== 1) {
     setValue('');
   }
-}, [allComments]);
+}, [showBackButton]);
 
 	return (
 		<div className="search">

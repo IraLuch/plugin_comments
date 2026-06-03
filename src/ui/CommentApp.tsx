@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Comment } from "../types";
 import { CommentsList } from "./components/commentsList";
@@ -13,17 +12,17 @@ type Props = {
 };
 
 export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
-
 	// используется как источник данных для фильтрации
 	const [allCommentsState, setAllCommentsState] =
 		useState<Comment[]>(allComments);
 
-		
 	// отображаемый список комментариев
 	const [comments, setComments] = useState<Comment[]>(allCommentsState);
 	const [replyCom, setReplyCom] = useState<Comment | null>(null);
 
-	const [showBackButton, setShowBackButton] = useState<boolean>(false);
+	const [showBackButton, setShowBackButton] = useState<boolean>(
+		plugin.isBlockMode,
+	);
 
 	// сортировка по времени
 	useEffect(() => {
@@ -35,16 +34,28 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 	}, [allComments]);
 
 	const handleBack = () => {
-		plugin.activateView();
-		setShowBackButton(false)
-	}
+		if (plugin.openedFromTag && plugin.tagId) {
+			plugin.activateView(null, plugin.tagId);
+		} else {
+			plugin.activateView();
+		}
+		console.log("d");
+		plugin.isBlockMode = false;
+	};
 
 	return (
 		<div className="comments">
+			<span
+				className="comments__btn-all"
+				style={{ opacity: showBackButton ? "1" : "0" }}
+				onClick={handleBack}
+			>
+				Назад
+			</span>
 			<div>
 				<h1 className="comment__header">Окно просмотра комментариев</h1>
-			{ showBackButton  && <span className="comments__btn-all" onClick={handleBack}>Ко всем комментариям</span>}
 				<Search
+					showBackButton={showBackButton}
 					allComments={allCommentsState}
 					setComments={setComments}
 				></Search>
@@ -52,13 +63,15 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 					{" "}
 					{replyCom && (
 						<CommentForm
+							setShowBackButton={setShowBackButton}
+							setReplyCom={setReplyCom}
 							comment={replyCom}
 							plugin={plugin}
 						></CommentForm>
 					)}
 				</div>
 				<CommentsList
-					setShowBackButton = {setShowBackButton}
+					setShowBackButton={setShowBackButton}
 					filePath={filePath}
 					comments={comments}
 					setReplyCom={setReplyCom}

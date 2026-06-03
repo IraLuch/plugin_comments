@@ -106,6 +106,7 @@ export class CommentTagWidget extends WidgetType {
     tagEl.onclick = () => {
 
       const plugin = this.getPlugin(view)
+      console.log(plugin)
       if (plugin) {
         if (!this.tagId) return;
         plugin.activateView(null, this.tagId);
@@ -119,7 +120,7 @@ export class CommentTagWidget extends WidgetType {
      * Извлечение экземпляра плагина 
      */
   private getPlugin(view: EditorView) {
-    return  (window as any).app.plugins.plugins['comments'] as CommentsPlugin;
+    return  (window as any).app.plugins.plugins['obsidian-inline-comments'] as CommentsPlugin;
 
   }
 }

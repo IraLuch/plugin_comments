@@ -14,7 +14,9 @@ button {
 	height: 25px;
 
 }
-
+.comment__header{
+	margin-top: 0;
+}
 .highlighted-comment-line {
 	background-color: var(--text-highlight-bg);
 	border-radius: 4px;

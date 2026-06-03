@@ -21,7 +21,7 @@ export const CommentsList = ({comments, plugin, filePath, setComments, setReplyC
     return <div className="comments__list">
  
 
-        {comments.length === 0 && <p style={{textAlign:'center'}}>В данном файле пока нет комментариев</p>}
+        {comments.length === 0 && <p style={{textAlign:'center'}}>Коменнтарии не найдены</p>}
         {comments.filter(c => !c.replyTo).map(c => <CommentItem setReplyCom={setReplyCom} plugin={plugin} setComments={setComments}
                                         comment={c} comments={comments} filePath={filePath} setAllCommentsState={setAllCommentsState}  setShowBackButton={setShowBackButton}
                                         ></CommentItem>)}

@@ -35,7 +35,7 @@ export class ViewCommentsView extends ItemView {
     this.root = createRoot(container);
     
     this.root.render(
-			<CommentForm filePath={filePath} plugin={this.plugin} selectedText={text}></CommentForm>
+			<CommentForm filePath={filePath} plugin={this.plugin} selectedText={text} ></CommentForm>
 		);
   }
 

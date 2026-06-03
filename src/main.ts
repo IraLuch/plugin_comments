@@ -11,10 +11,12 @@ export default class CommentsPlugin extends Plugin {
   // хранилище комментариев: Ключ — tagId, Значение — массив связанных объектов Comment
   commentsByText: Map<string, Comment[]> = new Map<string, Comment[]>();
 
-  id: string | null = null;
+  tagId: string | null = null;
   to: EditorPosition | null = null;
   from: EditorPosition | null = null;
   filePath: string | null = null;
+  public isBlockMode = false;
+  public openedFromTag = false;
 
   private sourceLeaf: WorkspaceLeaf | null = null;
 
@@ -32,6 +34,12 @@ export default class CommentsPlugin extends Plugin {
 
     this.registerEvent(
       this.app.workspace.on("file-open", async () => {
+
+          this.openedFromTag = false;
+        this.tagId = null;
+        this.isBlockMode = false;
+
+
         const activeFile = this.app.workspace.getActiveFile();
         if (!activeFile) return;
 
@@ -111,7 +119,7 @@ export default class CommentsPlugin extends Plugin {
     * если передан text — форма создания комментария,
     * иначе просмотр существующих комментариев
     */
-  async activateView(text: string | null = null, id: string | null = null) {
+  async activateView(text: string | null = null, tagId: string | null = null) {
 
     const { workspace } = this.app;
     const leaf = await this.getLeaf(VIEW_TYPE_COMMENTS);
@@ -124,17 +132,22 @@ export default class CommentsPlugin extends Plugin {
 
 
     if (view instanceof ViewCommentsView) {
-      if (text && id && this.filePath) { view.renderForm(text, this.filePath); }
+      if (text && tagId && this.filePath) { view.renderForm(text, this.filePath); }
 
       // открываем все комментарии файла
-      else if (!id) {
+      else if (!tagId) {
+        this.openedFromTag = false;
+    this.tagId = null;
+        this.isBlockMode = false;
         const allComments = Array.from(this.commentsByText.values()).flat().filter(c => c.filePath === activeFile?.path);
         view.renderComments(allComments, activeFile.path);
       }
 
       // открываем комментарии по блоку текста
       else {
-        const filterComments = this.commentsByText.get(id) || [];
+         this.openedFromTag = true;
+    this.tagId = tagId;
+        const filterComments = this.commentsByText.get(tagId) || [];
         view.renderComments(filterComments, activeFile.path);
       }
     }
@@ -172,10 +185,31 @@ export default class CommentsPlugin extends Plugin {
 
       this.insertTag(comment.tagId);
     }
-
-
     await this.saveComments();
-    this.activateView(null, comment.tagId);
+
+    const leaf = await this.getLeaf(VIEW_TYPE_COMMENTS);
+
+    if (!leaf) return;
+    const view = leaf.view;
+
+    const activeFile = this.app.workspace.getActiveFile();
+    if (!activeFile) return;
+
+
+    if (view instanceof ViewCommentsView) {
+      if (comment.replyTo) {
+        this.isBlockMode = true;
+        const coms =  this.getCommentBlock(comment)
+        console.log(coms);
+        view.renderComments(
+         coms,
+          activeFile.path
+        );
+      }
+      else {
+        this.activateView(null, comment.tagId);
+      }
+    }
   }
 
   /**
@@ -209,11 +243,13 @@ export default class CommentsPlugin extends Plugin {
 
     if (tagMatch && tagMatch[1]) {
 
-        this.id = tagMatch[1];
+      this.tagId = tagMatch[1];
     } else {
-      this.id = `${Date.now()}`;
+      this.tagId = `${Date.now()}`;
     }
-    await this.activateView(sel, this.id);
+    
+    this.openedFromTag = true;
+    await this.activateView(sel, this.tagId);
   }
 
 
@@ -236,7 +272,7 @@ export default class CommentsPlugin extends Plugin {
 
     this.to = null;
     this.from = null;
-    this.id = null;
+    this.tagId = null;
   }
 
   /**
@@ -378,23 +414,41 @@ export default class CommentsPlugin extends Plugin {
     }
 
   }
-  getCommentBlock(comment: Comment){
+  getCommentBlock(comment: Comment) {
 
-      const allComments = Array.from(this.commentsByText.values()).flat();
-      const result: Comment[] = [comment];
+    const allComments = Array.from(this.commentsByText.values()).flat();
 
-      const findReplies = (id: string) => {
-      const replies = allComments.filter(c => c.replyTo === id) 
+    // ищем корневой комментарий
+    let root = comment;
 
-        for (const r of replies){
-          result.push(r);
-          findReplies(r.id);
-        }
+    while (root.replyTo) {
+      const parent = allComments.find(
+        c => c.id === root.replyTo
+      );
 
+      if (!parent) break;
+
+      root = parent;
+    }
+
+    const result: Comment[] = [root];
+
+    const findReplies = (id: string) => {
+      const replies = allComments.filter(c => c.replyTo === id)
+
+      for (const r of replies) {
+        result.push(r);
+        findReplies(r.id);
       }
-    
-      findReplies(comment.id)
-      return result;
+
+    }
+
+
+    findReplies(root.id)
+    const sorted = [...result].sort(
+      (a, b) => Number(b.id) - Number(a.id),
+    );
+    return sorted;
   }
 
   async onunload() { }

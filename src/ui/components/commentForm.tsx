@@ -2,14 +2,18 @@ import { useState } from "react";
 import { Comment } from "../../types";
 import CommentsPlugin from "../../main";
 import { getCommentAuthor } from "../../utils";
+import { Notice } from "obsidian";
 
 // если comment есть — это режим ответа (reply),
 // иначе это создание нового комментария
 type Props = {
-	comment?: Comment;
-	plugin: CommentsPlugin;
-	selectedText?: string;
-	filePath?: string;
+	comment?: Comment
+	plugin: CommentsPlugin
+	selectedText?: string
+	filePath?: string
+	setShowBackButton?: (visible: boolean) => void
+	setReplyCom?: (comment: Comment | null) => void;
+	
 };
 
 /**
@@ -20,7 +24,8 @@ export const CommentForm = ({
 	comment,
 	plugin,
 	selectedText,
-	filePath,
+	filePath,setReplyCom,
+	setShowBackButton
 }: Props) => {
 	const [text, setText] = useState("");
 
@@ -32,12 +37,20 @@ export const CommentForm = ({
 
 		if (text.trim().length === 0) return;
 
+		if(comment && plugin.commentsByText.get(comment.tagId)?.filter(c => c.id === comment.id).length === 0){
+			new Notice('Комментарий на который вы хотите ответить не найден')
+			setReplyCom?.(null);
+			return;
+		}
+
+		console.log(comment && plugin.commentsByText.get(comment.tagId)?.filter(c => c.id === comment.id))
+
 		// Формируем объект комментария:
 		// - либо новый комментарий
 		// - либо ответ на существующий (replyTo)
 		const newCom: Comment = {
 			id: `${Date.now()}`,
-			tagId: comment ? comment.tagId : plugin.id || `${Date.now()}`,
+			tagId: comment ? comment.tagId : plugin.tagId || `${Date.now()}`,
 			selectedText: comment ? comment.selectedText : selectedText || "",
 			comment: text,
 			filePath: comment ? comment.filePath : filePath || "",
@@ -47,7 +60,9 @@ export const CommentForm = ({
 			replyTo: comment ? comment.id : null,
 		};
 
-		plugin.createComment(newCom);
+		await plugin.createComment(newCom);
+		
+		
 	};
 
 	return (

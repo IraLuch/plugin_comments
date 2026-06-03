@@ -104,18 +104,13 @@ export const CommentItem = ({
 	const replyes = comments.filter((c) => c.replyTo === comment.id);
 
 	const handleToBlock = (comment: Comment) => {
+		setShowBackButton(true)
 	    const comments=	plugin.getCommentBlock(comment)
 		setComments(comments)
-		setAllCommentsState(comments)
-		setShowBackButton(true)
 	}
 
-	const hasAction = new Set(comments.map(c => c.tagId)).size !== 1
-
 	return (
-		<div className={hasAction? "comment__thread": ''}  onClick={hasAction
-																	? () => handleToBlock(comment)
-																	: undefined }>
+		<div className="comment__thread" onClick={() => handleToBlock(comment)}>
 			<div className="comment__item" id={comment.id}>
 				<div className="comment__item-header">
 					<div className="comment__info">
