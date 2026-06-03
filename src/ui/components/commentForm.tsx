@@ -43,7 +43,6 @@ export const CommentForm = ({
 			return;
 		}
 
-		console.log(comment && plugin.commentsByText.get(comment.tagId)?.filter(c => c.id === comment.id))
 
 		// Формируем объект комментария:
 		// - либо новый комментарий

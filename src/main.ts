@@ -200,7 +200,6 @@ export default class CommentsPlugin extends Plugin {
       if (comment.replyTo) {
         this.isBlockMode = true;
         const coms =  this.getCommentBlock(comment)
-        console.log(coms);
         view.renderComments(
          coms,
           activeFile.path

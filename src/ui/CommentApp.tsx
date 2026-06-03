@@ -39,7 +39,6 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 		} else {
 			plugin.activateView();
 		}
-		console.log("d");
 		plugin.isBlockMode = false;
 	};
 

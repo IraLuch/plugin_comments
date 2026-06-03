@@ -106,7 +106,6 @@ export class CommentTagWidget extends WidgetType {
     tagEl.onclick = () => {
 
       const plugin = this.getPlugin(view)
-      console.log(plugin)
       if (plugin) {
         if (!this.tagId) return;
         plugin.activateView(null, this.tagId);
