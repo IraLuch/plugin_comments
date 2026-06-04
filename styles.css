@@ -141,14 +141,41 @@ button {
 }
 .comment__replies-box {
     position: relative;
-	padding-left: 8px;
-	border-left: 2px solid var(--bento-border-color, var(--divider-color));
+    padding-left: 8px;
+    border-left: 2px solid var(--bento-border-color, var(--divider-color));
+    border-left-color: rgba(var(--mono-rgb-100), 0.15);
+
+   
 }
 
-.comment__replies-box {
-    border-left-color: rgba(var(--mono-rgb-100), 0.15);
+.comment__replies-wrapper {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.3s ease, opacity 0.2s ease;
+  opacity: 1;
+}
+
+.comment__replies-wrapper.closed {
+  grid-template-rows: 0fr;
+  opacity: 0.4;
+}
+
+.comment__replies-inner {
+  overflow: hidden;
 }
 
 .c {
     margin: 20px 0;
 }
+
+.comment__item-body{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.comment__item-arrow{
+    display: block;
+    width: 15px;
+    height: 25px;}
+

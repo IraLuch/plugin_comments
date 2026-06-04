@@ -2,6 +2,7 @@ import CommentsPlugin from "../../main";
 import { Comment } from "../../types";
 import * as obsidian from "obsidian";
 import { formatCommentDate } from "../../utils";
+import React, { useState } from "react";
 
 type Props = {
 	plugin: CommentsPlugin;
@@ -11,7 +12,7 @@ type Props = {
 	setReplyCom: (Comment: Comment) => void;
 	filePath: string;
 	setAllCommentsState: (comments: Comment[]) => void;
-	 setShowBackButton: (visible: boolean) => void;
+	setShowBackButton: (visible: boolean) => void;
 };
 
 export const CommentItem = ({
@@ -22,10 +23,10 @@ export const CommentItem = ({
 	setComments,
 	filePath,
 	setAllCommentsState,
-	setShowBackButton
+	setShowBackButton,
 }: Props) => {
 	const replyCom = comments?.find((c) => c.id == comment.replyTo);
-
+	const [activeArrow, setActiveArrow] = useState(true);
 	/**
 	 * Контекстное меню комментария:
 	 * - ответить
@@ -35,7 +36,7 @@ export const CommentItem = ({
 	const displayMenu = (e: React.MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
-				const menu = new obsidian.Menu();
+		const menu = new obsidian.Menu();
 
 		menu.addItem((item) =>
 			item
@@ -80,7 +81,7 @@ export const CommentItem = ({
 	/**
 	 * Подсветка родительского комментария в списке
 	 */
-	const searchReply = (e:React.MouseEvent, comment: Comment) => {
+	const searchReply = (e: React.MouseEvent, comment: Comment) => {
 		e.preventDefault();
 		e.stopPropagation();
 		plugin.searchReply(comment, replyCom);
@@ -104,10 +105,16 @@ export const CommentItem = ({
 	const replyes = comments.filter((c) => c.replyTo === comment.id);
 
 	const handleToBlock = (comment: Comment) => {
-		setShowBackButton(true)
-	    const comments=	plugin.getCommentBlock(comment)
-		setComments(comments)
-	}
+		setShowBackButton(true);
+		const comments = plugin.getCommentBlock(comment);
+		setComments(comments);
+	};
+
+	const handleClose = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setActiveArrow((prev) => !prev);
+	};
 
 	return (
 		<div className="comment__thread" onClick={() => handleToBlock(comment)}>
@@ -133,13 +140,29 @@ export const CommentItem = ({
 						⋮
 					</div>
 				</div>
-				<div className="comment__item-body">{comment.comment}</div>
+				<div className="comment__item-body">
+					<div className="comment__item-text">{comment.comment}</div>
+					{replyes.length > 0 ? (
+						<div
+							className="comment__item-arrow"
+							onClick={(e) => handleClose(e)}
+						>
+							{activeArrow ? "▶" : "▼"}
+						</div>
+					) : (
+						""
+					)}
+				</div>
 			</div>
-			{replyes.length > 0 && (
-				<div className="comment__replies-box">
+			<div
+				className={`comment__replies-wrapper ${
+					activeArrow ? "open" : "closed"
+				}`}
+			>
+				<div className="comment__replies-inner comment__replies-box ">
 					{replyes.map((reply) => (
 						<CommentItem
-						setShowBackButton ={setShowBackButton}
+							setShowBackButton={setShowBackButton}
 							setAllCommentsState={setAllCommentsState}
 							key={reply.id}
 							filePath={filePath}
@@ -151,7 +174,7 @@ export const CommentItem = ({
 						/>
 					))}
 				</div>
-			)}
+			</div>
 		</div>
 	);
 };
