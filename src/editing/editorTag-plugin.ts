@@ -119,7 +119,7 @@ export class CommentTagWidget extends WidgetType {
      * Извлечение экземпляра плагина 
      */
   private getPlugin(view: EditorView) {
-    return  (window as any).app.plugins.plugins['obsidian-inline-comments'] as CommentsPlugin;
+    return  (window as any).app.plugins.plugins['comments-plugin-iraluch'] as CommentsPlugin;
 
   }
 }

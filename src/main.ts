@@ -137,6 +137,7 @@ export default class CommentsPlugin extends Plugin {
       // открываем все комментарии файла
       else if (!tagId) {
         this.openedFromTag = false;
+        
     this.tagId = null;
         this.isBlockMode = false;
         const allComments = Array.from(this.commentsByText.values()).flat().filter(c => c.filePath === activeFile?.path);
@@ -146,7 +147,8 @@ export default class CommentsPlugin extends Plugin {
       // открываем комментарии по блоку текста
       else {
          this.openedFromTag = true;
-    this.tagId = tagId;
+         this.tagId = tagId;
+             this.isBlockMode = true;
         const filterComments = this.commentsByText.get(tagId) || [];
         view.renderComments(filterComments, activeFile.path);
       }
@@ -199,6 +201,7 @@ export default class CommentsPlugin extends Plugin {
     if (view instanceof ViewCommentsView) {
       if (comment.replyTo) {
         this.isBlockMode = true;
+         this.tagId = comment.tagId;
         const coms =  this.getCommentBlock(comment)
         view.renderComments(
          coms,
@@ -206,6 +209,7 @@ export default class CommentsPlugin extends Plugin {
         );
       }
       else {
+    
         this.activateView(null, comment.tagId);
       }
     }

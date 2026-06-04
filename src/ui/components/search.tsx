@@ -5,19 +5,20 @@ type Props = {
 	setComments: (comments: Comment[]) => void;
 	allComments: Comment[];
 	showBackButton:  boolean 
+	comments: Comment[]
 };
 
 /**
  * Поиск комментариев по выделенному тексту блока,
  * выбор уникальных блоков комментариев
  */
-export const Search = ({ setComments, allComments, showBackButton }: Props) => {
+export const Search = ({ setComments, allComments, showBackButton, comments }: Props) => {
 	const [value, setValue] = useState("");
 	const [isVisible, setIsVisible] = useState(false);
 
 	// убираем дубликаты комментариев по tagId
 	const uniqueBlocks = Array.from(
-		new Map(allComments.map((c) => [c.tagId, c])).values(),
+		new Map(comments.map((c) => [c.tagId, c])).values(),
 	);
 
 	/**

@@ -20,9 +20,7 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 	const [comments, setComments] = useState<Comment[]>(allCommentsState);
 	const [replyCom, setReplyCom] = useState<Comment | null>(null);
 
-	const [showBackButton, setShowBackButton] = useState<boolean>(
-		plugin.isBlockMode,
-	);
+	const [showBackButton, setShowBackButton] = useState<boolean>(plugin.isBlockMode);
 
 	// сортировка по времени
 	useEffect(() => {
@@ -34,11 +32,9 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 	}, [allComments]);
 
 	const handleBack = () => {
-		if (plugin.openedFromTag && plugin.tagId) {
-			plugin.activateView(null, plugin.tagId);
-		} else {
-			plugin.activateView();
-		}
+
+		plugin.activateView();
+		
 		plugin.isBlockMode = false;
 	};
 
@@ -49,11 +45,12 @@ export const CommentApp = ({ allComments, plugin, filePath }: Props) => {
 				style={{ opacity: showBackButton ? "1" : "0" }}
 				onClick={handleBack}
 			>
-				Назад
+				Вернутся к списку комментариев
 			</span>
 			<div>
 				<h1 className="comment__header">Окно просмотра комментариев</h1>
 				<Search
+				comments = {comments}
 					showBackButton={showBackButton}
 					allComments={allCommentsState}
 					setComments={setComments}
